@@ -18,7 +18,7 @@ class CommentSerializer(serializers.ModelSerializer):
         model=Comment
         fields='__all__'
         
-    def get_recomments_num(self,obj): 
+    def get_recomment_num(self,obj): 
         return Recomment.objects.filter(comment=obj).count()
     
     def get_comment_like_num(self,obj): 
