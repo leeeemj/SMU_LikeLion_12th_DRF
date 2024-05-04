@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from posts.models import Post
 from posts.serializers import PostSerializer
 from rest_framework import status
+from rest_framework.decorators import api_view
+
 # Create your views here.
 
 #게시물리스트
