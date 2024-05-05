@@ -6,7 +6,7 @@ from users.serializers import *
 
 
 class PostSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializer(required=False)
     posts_like_num=serializers.SerializerMethodField()
     comments_num=serializers.SerializerMethodField()
     class Meta:
