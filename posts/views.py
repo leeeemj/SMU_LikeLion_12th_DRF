@@ -5,6 +5,8 @@ from posts.serializers import PostSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
 from users.models import User
+from comments.models import Comment
+from comments.serializers import CommentSerializer
 # Create your views here.
 
 #게시물리스트
@@ -27,8 +29,7 @@ def post_list(request):
 
 #게시물 내용 
 @api_view(['GET','PUT','DELETE'])
-def post_detail(request,pk): #여기선 pk = user id 
-    ##세미나때 일단 아무 유저가 get 통해서 사용하라 하셨는데 어떻게 해야되는건지 모르겠습니다 ... 
+def post_detail(request,pk): #여기선 pk = postid
     #pk 있는 함수에서는 예외처리를 해줘야 한다. 
     try:
         post=Post.objects.get(id=pk)
@@ -47,6 +48,21 @@ def post_detail(request,pk): #여기선 pk = user id
     elif request.method=='DELETE':
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+#게시물 댓글 가져오기 
+@api_view(['GET'])
+def post_comments(request,pk):
+    try:
+        post=Post.objects.get(id=pk)
+    except Post.DoesNotExist: #해당 유저가 쓴 게시물 없으면 404 
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method=='GET':
+        comments=Comment.objects.fillter(post=post)
+        serializer=CommentSerializer(comments,many=True)
+        return Response(serializer.data)
+        
+
+
     
     
         
