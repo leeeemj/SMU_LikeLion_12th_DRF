@@ -7,7 +7,7 @@ from users.serializers import *
 
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    post =PostSerializer()
+    post =PostSerializer(required=False)
 
     #답글 수 
     recomment_num=serializers.SerializerMethodField()
