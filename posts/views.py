@@ -1,67 +1,105 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from posts.models import Post
+from posts.models import PostLike
 from posts.serializers import PostSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
 from users.models import User
 from comments.models import Comment
 from comments.serializers import CommentSerializer
+
 # Create your views here.
 
 #게시물리스트
 @api_view(['GET','POST']) #허용할 메소드 
 def post_list(request):
-    if request.method=='GET': #가져오기
-        posts=Post.objects.all() #model Post의 모든 객체 가져오기
-        serializer=PostSerializer(posts,many=True) #posts라는 객체를 직렬화하고 여러 객체를 직렬화한다. many=True : 객체가 여러개일때 
+    if request.method=='GET': 
+        posts=Post.objects.all() 
+        serializer=PostSerializer(posts,many=True) 
         return Response(serializer.data,status=status.HTTP_200_OK)
-    elif request.method=='POST': #생성하기 (게시물 리스트에 추가하기)
-        #요청 통해 들어온 자원 serializer 해줘야함 -> get과는 반대 방향으로 직렬화 
-        #누가 생성했는데 user가 필요함 ->외래키 직접 설정해주어야함 
-        serializer=PostSerializer(data=request.data) #한번에 한개 쓸거니까 many 필요 없을 듯 
-        TEST_USER=User.objects.get(id=1)
+    elif request.method=='POST': 
+        serializer=PostSerializer(data=request.data)  
         if serializer.is_valid():
-            serializer.save(user=TEST_USER) #값 유효하면 저장, 저장해서 db update
+            serializer.save(user=request.user)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    # TEST_USER=User.objects.get(id=1)
+        # if serializer.is_valid():
+        #     try:
+        #         serializer.save(user=request.user)
+        #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+        #     except Exception as e:
+        #         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 #게시물 내용 
+#게시물 쓴 사람만이 put,delete 가능하도록 하려면
+#login_required or PermissionRequiredMixin 사용 
 @api_view(['GET','PUT','DELETE'])
-def post_detail(request,pk): #여기선 pk = postid
+def post_detail(request,post_id): #여기선 pk = postid
     #pk 있는 함수에서는 예외처리를 해줘야 한다. 
     try:
-        post=Post.objects.get(id=pk)
-    except Post.DoesNotExist: #해당 유저가 쓴 게시물 없으면 404 
+        post=Post.objects.get(id=post_id)
+    except Post.DoesNotExist: 
         return Response(status=status.HTTP_404_NOT_FOUND)
     
     if request.method=='GET':
         serializer=PostSerializer(post) #해당 게시물 시리얼라이저에 담기 
-        return Response(serializer.data)
+        return Response(serializer.data,status=status.HTTP_200_OK)
     elif request.method=='PUT':
         serializer=PostSerializer(post,data=request.data) #수정
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND) 
+            try:
+                serializer.save(user=request.user)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'error': '서버 내부 오류가 발생했습니다. 관리자에게 문의해주세요.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response(serializer.data)
+        # return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND) #errors에 오류정보 담겨 있음  
     elif request.method=='DELETE':
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    #자꾸 슬래시 빼먹어서 오류남 
+    #http://127.0.0.1:8000/posts/6/  
+
+#내가 작성한 게시물 조회 만들기 -> 댓글 되면 ..
 
 #게시물 댓글 가져오기 
 @api_view(['GET'])
-def post_comments(request,pk):
+def post_comments(request,post_id):
     try:
-        post=Post.objects.get(id=pk)
+        post=Post.objects.get(id=post_id)
     except Post.DoesNotExist: #해당 유저가 쓴 게시물 없으면 404 
         return Response(status=status.HTTP_404_NOT_FOUND)
-    if request.method=='GET':
-        comments=Comment.objects.fillter(post=post)
-        serializer=CommentSerializer(comments,many=True)
-        return Response(serializer.data)
+    comments=Comment.objects.filter(post=post_id)
+    serializer=CommentSerializer(comments,many=True)
+    return Response(serializer.data)
         
-
+#좋아요 생성 및 삭제 
+@api_view(['POST','DELETE'])
+def post_like(request,post_id):
+    try:
+        post=Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method=='POST':
+        if PostLike.objects.filter(user=request.user, post=post).exists():
+            return Response({'좋아요 이미 존재'},status=status.HTTP_400_BAD_REQUEST)
+        else:
+            postlike=PostLike.objects.create(user=request.user,post=post) #objects.create 사용하거나 serializer 사용해서 생성 가능함
+            return Response({'좋아요'},status=status.HTTP_201_CREATED)
+    
+    elif request.method=='DELETE':
+        postlike=PostLike.objects.get(user=request.user, post=post)
+        postlike.delete()
+        return Response({'좋아요 삭제'},status=status.HTTP_204_NO_CONTENT)
+        
+#유저는 게시물에 좋아요 하나만 달 수 있음 .
 
     
     

@@ -3,6 +3,8 @@ from posts import views
 
 urlpatterns = [
     path('',views.post_list, name='post-list'),
-    path('<int:pk>/', views.post_detail,name='post-detail'),
-    path('<int:pk>/comments/',views.post_comments,name='post-comments')
+    #프론트에서 url로 넣어주는 거
+    path('<int:post_id>/', views.post_detail,name='post-detail'),
+    path('<int:post_id>/comments/',views.post_comments,name='post-comments'),
+    path('<int:post_id>/postlikes/',views.post_like, name='post_like')
 ]

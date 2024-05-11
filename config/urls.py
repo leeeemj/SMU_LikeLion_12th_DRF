@@ -23,11 +23,8 @@ from django.conf import settings
 urlpatterns = [
     path('users/', include('users.urls')), #users로 시작하는 모든 패턴은 users.urls가서 찾아라
     path('posts/',include('posts.urls')),
-    # path('postlikes/',include('postlikes.urls')),
     path('comments/',include('comments.urls')),
-    # path('commentlikes/',include('postlikes.urls')),
     path('recomments/',include('recomments.urls')),
-    # path('recommentlikes/',include('postlikes.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

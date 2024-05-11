@@ -12,3 +12,7 @@ class Post(models.Model):
     updated_at=models.DateTimeField(auto_now=True)
     image=models.ImageField(upload_to='posts/', height_field=200, width_field=200, max_length=None,null=True)
     location_tag=models.CharField(max_length=50,null=True)
+
+class PostLike(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='post_likes',null=True)
+    post = models.ForeignKey('posts.Post',on_delete=models.CASCADE,related_name='post_likes',null=True)

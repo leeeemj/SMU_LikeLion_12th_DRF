@@ -39,13 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'users',
     'posts',
-    'post_likes',
     'comments',
-    'comment_likes',
     'recomments',
-    'recomment_likes',
 ]
 
 MIDDLEWARE = [
@@ -136,3 +134,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 AUTH_USER_MODEL='users.User'
+
+#JWT
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}

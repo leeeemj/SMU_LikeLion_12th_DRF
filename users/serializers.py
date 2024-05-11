@@ -13,3 +13,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_posts_num(self,obj): #obj=시리얼라이징한 대상 
         return Post.objects.filter(user=obj).count()
+    
+    def create(self, validated_data):
+        # return User.objects.create_user(**validated_data)
+        #회원가입할 때 username,email,password는 필수로 받도록
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password']
+        )
+        return user

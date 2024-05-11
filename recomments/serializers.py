@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from recomment_likes.models import RecommentLike
 from users.serializers import *
 from comments.serializers import CommentSerializer
 from recomments.models import Recomment
+from recomments.models import RecommentLike
 
 
 class ReCommentSerializer(serializers.ModelSerializer):
@@ -18,3 +18,11 @@ class ReCommentSerializer(serializers.ModelSerializer):
 
     def get_recomment_like_num(self,obj): 
         return RecommentLike.objects.filter(recomment=obj).count()
+    
+
+class ReCommentLikeSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    recomment =ReCommentSerializer()
+    class Meta:
+        model=RecommentLike
+        fields='__all__'
