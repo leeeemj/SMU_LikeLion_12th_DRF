@@ -57,3 +57,22 @@ def recomment_like(request,pk):
     elif request.method=='DELETE':
         recommentlike.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)   
+
+#좋아요 생성 및 삭제 
+@api_view(['POST','DELETE'])
+def post_like(request,pk):
+    try:
+        comment=Comment.objects.get(id=pk)
+    except Recomment.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method=='POST':
+        recommentLike=RecommentLike.objects.filter(user=request.user, comment=comment).exists()
+        if recommentLike.exists():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_201_CREATED)
+    
+    elif request.method=='DELETE':
+        recommentLike.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

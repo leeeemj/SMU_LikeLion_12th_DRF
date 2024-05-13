@@ -41,9 +41,9 @@ def user_detail(request,pk):
             #비번수정한게 반영이 x -> 수정하고 로그인하면 401에러 발생
             #비번은 따로 처리 필요
             # password write_only 설정-> set_password 사용 (암호화하여 저장)
-            user=serializer.save()
+            user=serializer.save() #생성된 모델 인스턴스가 user에 저장 , 직렬화된 데이터 저장이 아님
             if 'modify_pw' in request.data:
-                user.set_password(request.data['modify_pw'])
+                user.set_password(request.data['modify_pw']) #user로 해결하면 되는 것
                 user.save()
             return Response(serializer.data)
             #비밀번호 수정 가능해짐

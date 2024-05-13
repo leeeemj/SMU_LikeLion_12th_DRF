@@ -89,15 +89,15 @@ def post_like(request,post_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method=='POST':
         if PostLike.objects.filter(user=request.user, post=post).exists():
-            return Response({'좋아요 이미 존재'},status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             postlike=PostLike.objects.create(user=request.user,post=post) #objects.create 사용하거나 serializer 사용해서 생성 가능함
-            return Response({'좋아요'},status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_201_CREATED)
     
     elif request.method=='DELETE':
         postlike=PostLike.objects.get(user=request.user, post=post)
         postlike.delete()
-        return Response({'좋아요 삭제'},status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
         
 #유저는 게시물에 좋아요 하나만 달 수 있음 .
 

@@ -6,8 +6,13 @@ from recomments.models import Recomment
 from users.serializers import *
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = UserSerializer(required=False)
-    post =PostSerializer(required=False)
+    user = serializers.PrimaryKeyRelatedField(read_only=True) #관계된 객체 ID만 반환
+    post = serializers.PrimaryKeyRelatedField(read_only=True)
+    #serializer.save(user=request.user,post=post)할 때 들어오는 user와 post가 저장된다.
+    # PrimaryKeyrelatedField() => 연결되어 있는 collection 자동으로 찾아줌 
+    
+    # user = UserSerializer(required=False) # required=False => 해당 필드 필수 아님
+    # post =PostSerializer(required=False)
 
     #답글 수 
     recomment_num=serializers.SerializerMethodField()
@@ -32,4 +37,4 @@ class CommentLikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=CommentLike
-        fields='__all__' #댓글 좋아요에선 가져올게 없는데 all...?
+        fields='__all__' 

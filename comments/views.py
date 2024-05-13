@@ -23,8 +23,6 @@ def comment_create(request,post_id):
         serializer.save(user=request.user,post=post) #post 객체를 넘겨야 함 
         return Response(serializer.data,status=status.HTTP_201_CREATED)
         #게시물 댓글에 게시물 전체 내용까지 저장될 필요는 없는 것 같음 
-        ##간단하게 추려도 되나여 ?? 
-        
     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -69,13 +67,13 @@ def comment_like(request,comment_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method=='POST':
         if CommentLike.objects.filter(user=request.user, comment=comment).exists():
-            return Response({'좋아요 이미 존재'},status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             commentlike=CommentLike.objects.create(user=request.user,comment=comment) #objects.create 사용하거나 serializer 사용해서 생성 가능함
-            return Response({'좋아요'},status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_201_CREATED)
     
     elif request.method=='DELETE':
         commentlike=CommentLike.objects.get(user=request.user, comment=comment)
         commentlike.delete()
-        return Response({'좋아요 삭제'},status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
         
