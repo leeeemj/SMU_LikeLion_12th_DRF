@@ -15,11 +15,14 @@ def recomment_create(request,comment_id):
         comment=Comment.objects.get(id=comment_id) #댓글 달고자하는 게시물 존재 확인
     except Comment.DoesNotExist: 
         return Response(status=status.HTTP_404_NOT_FOUND)
+    
     serializer=ReCommentSerializer(data=request.data)
+    
     if serializer.is_valid():
-        serializer.save(user=request.user,comment=comment) #post 객체를 넘겨야 함 
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
         
+        serializer.save(user=request.user,comment=comment) #post 객체를 넘겨야 함 
+        
+        return Response(serializer.errors,status=status.HTTP_201_CREATED)
     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
    
 
@@ -42,37 +45,24 @@ def recomment_detail(request,pk):
     elif request.method=='DELETE':
         recomment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-#답글 좋아요 
-@api_view(['POST','DELETE'])
-def recomment_like(request,pk):
-    try:
-        recomment = Recomment.objects.get(id=pk)
-    except Recomment.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
 
-    recommentlike=RecommentLike.objects.create(user=pk,recomment=recomment)
-    if request.method=='POST':
-        serializer=ReCommentLikeSerializer(recommentlike)
-        return Response(serializer,status=status.HTTP_201_CREATED)
-    elif request.method=='DELETE':
-        recommentlike.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)   
 
 #좋아요 생성 및 삭제 
 @api_view(['POST','DELETE'])
-def post_like(request,pk):
+def recomment_like(request,recomment_id):
     try:
-        comment=Comment.objects.get(id=pk)
+        recomment=Recomment.objects.get(id=recomment_id)
     except Recomment.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     
     if request.method=='POST':
-        recommentLike=RecommentLike.objects.filter(user=request.user, comment=comment).exists()
-        if recommentLike.exists():
+        if RecommentLike.objects.filter(user=request.user, recomment=recomment).exists():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
+            recommentlike=RecommentLike.objects.create(user=request.user,recomment=recomment) #objects.create 사용하거나 serializer 사용해서 생성 가능함
             return Response(status=status.HTTP_201_CREATED)
     
     elif request.method=='DELETE':
-        recommentLike.delete()
+        recommentlike=RecommentLike.objects.get(user=request.user, recomment=recomment)
+        recommentlike.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

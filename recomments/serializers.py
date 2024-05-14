@@ -6,8 +6,10 @@ from recomments.models import RecommentLike
 
 
 class ReCommentSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    comment=CommentSerializer()
+    # user = serializers.PrimaryKeyRelatedField(read_only=True) #관계된 객체 ID만 반환
+    # comment = serializers.PrimaryKeyRelatedField(read_only=True)
+    user = UserSerializer(required=False)
+    comment=CommentSerializer(required=False)
     
     #답글 좋아요 수 
     recomment_like_num=serializers.SerializerMethodField()

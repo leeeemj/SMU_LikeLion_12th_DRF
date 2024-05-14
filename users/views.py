@@ -4,9 +4,12 @@ from posts.models import Post
 from users.serializers import UserSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
+# from rest_framework.decorators.action 
 from users.models import User
 from django.contrib.auth.hashers import check_password
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.views.generic import CreateView
+
 # Create your views here.
 
 #회원가입
@@ -23,7 +26,10 @@ def user_join(request):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         #username,email,password 다 안 넣어서 생기는 오류 처리 생각하기 
-
+#CBV ver 회원가입 조회는 list어쩌구
+# class GenericAPIView(createAPIView):
+#     queryset=User.objects
+#이부분을 추가하고 싶은데 어느부분을 오버라이딩할지는 가서살펴보거나 지피티
 #회원 정보 수정, 탈퇴, 보기
 @api_view(['GET','PUT','DELETE'])
 def user_detail(request,pk):

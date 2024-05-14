@@ -13,7 +13,6 @@ class CommentSerializer(serializers.ModelSerializer):
     
     # user = UserSerializer(required=False) # required=False => 해당 필드 필수 아님
     # post =PostSerializer(required=False)
-
     #답글 수 
     recomment_num=serializers.SerializerMethodField()
     #댓글 좋아요 수 
