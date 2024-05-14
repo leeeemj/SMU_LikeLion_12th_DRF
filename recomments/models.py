@@ -11,5 +11,5 @@ class Recomment(models.Model):
     
 class RecommentLike(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='recomment_likes',null=True)
-    recomment = models.ForeignKey('comments.Comment',on_delete=models.CASCADE,related_name='recomment_likes',null=True)
+    recomment = models.ForeignKey('recomments.Recomment',on_delete=models.CASCADE,related_name='recomment_likes',null=True)
     

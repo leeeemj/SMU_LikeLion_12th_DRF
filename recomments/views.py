@@ -4,7 +4,6 @@ from comments.models import Comment
 from recomments.models import Recomment
 from recomments.models import RecommentLike
 from recomments.serializers import ReCommentSerializer
-from recomments.serializers import ReCommentLikeSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
 # Create your views here.
@@ -22,7 +21,7 @@ def recomment_create(request,comment_id):
         
         serializer.save(user=request.user,comment=comment) #post 객체를 넘겨야 함 
         
-        return Response(serializer.errors,status=status.HTTP_201_CREATED)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
    
 
@@ -41,7 +40,7 @@ def recomment_detail(request,pk):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND) 
+        return Response(serializer.data,status=status.HTTP_404_NOT_FOUND) 
     elif request.method=='DELETE':
         recomment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

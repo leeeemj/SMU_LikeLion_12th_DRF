@@ -63,7 +63,7 @@ def recomment_list(request,pk):
 def comment_like(request,comment_id):
     try:
         comment=Comment.objects.get(id=comment_id)
-    except Post.DoesNotExist:
+    except Comment.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method=='POST':
         if CommentLike.objects.filter(user=request.user, comment=comment).exists():
