@@ -5,14 +5,24 @@ from posts.models import PostLike
 from posts.serializers import PostSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
-from users.models import User
 from comments.models import Comment
 from comments.serializers import CommentSerializer
-
+from rest_framework.generics import (
+    ListAPIView,
+    CreateAPIView,
+    RetrieveAPIView,
+    UpdateAPIView,
+    DestroyAPIView,
+    ListCreateAPIView,
+    RetrieveUpdateAPIView,
+    RetrieveDestroyAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
+from rest_framework import viewsets
 # Create your views here.
 
-#게시물리스트
-@api_view(['GET','POST']) #허용할 메소드 
+#게시물리스트 + 게시물 생성
+@api_view(['GET','POST']) 
 def post_list(request):
     if request.method=='GET': 
         posts=Post.objects.all() 
@@ -24,15 +34,6 @@ def post_list(request):
             serializer.save(user=request.user)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    # TEST_USER=User.objects.get(id=1)
-        # if serializer.is_valid():
-        #     try:
-        #         serializer.save(user=request.user)
-        #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-        #     except Exception as e:
-        #         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
 #게시물 내용 
 #게시물 쓴 사람만이 put,delete 가능하도록 하려면
@@ -98,9 +99,41 @@ def post_like(request,post_id):
         postlike=PostLike.objects.get(user=request.user, post=post)
         postlike.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-        
-#유저는 게시물에 좋아요 하나만 달 수 있음 .
 
+#generics ver
+
+#게시물리스트 조회 및 생성
+class PostListView(ListCreateAPIView):
+    queryset=Post.objects.all()
+    serializer_class=PostSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+#게시물 detail
+class PostDetailView(RetrieveUpdateDestroyAPIView):
+    queryset=Post.objects.all()
+    serializer_class=PostSerializer
+    # lookup_field='id'
+    # lookup_url_kwarg='post_id'
+    #kwarg에 url파라디터 담겨 있음 
+    #self.kwargs != **kwargs
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+    
+# class PostViewSet(viewsets.ModelViewSet):
+#     queryset=Post.objects.all()
+#     serializer_class=PostSerializer
     
     
         
