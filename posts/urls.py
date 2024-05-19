@@ -1,8 +1,6 @@
 from django.urls import path
 from posts import views
-# from rest_framework.routers import DefaultRouter
-# router=DefaultRouter()
-# router.register(r'post',views.PostViewSet)
+
 
 urlpatterns = [
     #FBV urls
@@ -12,13 +10,10 @@ urlpatterns = [
     path('<int:post_id>/postlikes/',views.post_like, name='post_like'),
     
     #generics 
-    path('/',views.PostListView.as_view(),name='post_list'),
-    path('<int:pk>/',views.PostDetailView.as_view)
+    path('',views.PostListView.as_view(),name='post_list'),
+    path('<int:pk>/',views.PostDetailView.as_view),
     # path('<int:pk>/',views.PostDetailView.as_view(),name='post_detail'),
     
-    #viewsets
 
     
 ]
-
-# urlpatterns+=router.urls

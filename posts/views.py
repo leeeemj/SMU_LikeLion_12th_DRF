@@ -107,11 +107,8 @@ class PostListView(ListCreateAPIView):
     queryset=Post.objects.all()
     serializer_class=PostSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+    def allowed_methods(self):
+        return ['GET', 'POST']
 
 
 #게시물 detail
