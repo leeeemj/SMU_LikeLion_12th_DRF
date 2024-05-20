@@ -8,8 +8,8 @@ from rest_framework.decorators import api_view
 from users.models import User
 from django.contrib.auth.hashers import check_password
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.views.generic import CreateView
-
+from rest_framework import viewsets
+from rest_framework.decorators import action
 # Create your views here.
 
 #회원가입
@@ -26,10 +26,7 @@ def user_join(request):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         #username,email,password 다 안 넣어서 생기는 오류 처리 생각하기 
-#CBV ver 회원가입 조회는 list어쩌구
-# class GenericAPIView(createAPIView):
-#     queryset=User.objects
-#이부분을 추가하고 싶은데 어느부분을 오버라이딩할지는 가서살펴보거나 지피티
+
 #회원 정보 수정, 탈퇴, 보기
 @api_view(['GET','PUT','DELETE'])
 def user_detail(request,pk):
@@ -88,3 +85,34 @@ def user_login(request):
 #         serializer=UserSerializer(request.user)
 #         return Response(serializer.data,status=status.HTTP_200_OK)
 #     return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+#viewset
+#회원가입
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset=User.objects.all()
+    serializer_class=UserSerializer
+    lookup_field='id'
+    lookup_url_kwarg='user_id'
+
+    @action(methods=['POST'],detail=False,url_path='login',url_name='user_login')
+    def user_login(self,request):
+        username=request.data.get('username')
+        password=request.data.get('password')
+
+        user=User.objects.get(username=username)
+        #user.password는 암호화된 상태 
+        if not check_password(password,user.password):
+            return Response({'비번 틀림'},status=status.HTTP_401_UNAUTHORIZED)
+        #토큰 발급 과정 
+        token=RefreshToken.for_user(user) #토큰 발급 방법 여러개 중 하나
+        serializer=UserSerializer(user)
+        return Response(
+            status=status.HTTP_200_OK,
+            data={
+                'token':str(token.access_token), #위의 token과 다름 
+                'user':serializer.data,
+            }
+        )
+
+    
