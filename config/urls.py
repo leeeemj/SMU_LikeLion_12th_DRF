@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 from django.conf import settings 
 
 urlpatterns = [
-    path('users/', include('users.urls')), #users로 시작하는 모든 패턴은 users.urls가서 찾아라
+    path('', include('users.urls')), #users로 시작하는 모든 패턴은 users.urls가서 찾아라
     path('posts/',include('posts.urls')),
     path('comments/',include('comments.urls')),
     path('recomments/',include('recomments.urls')),

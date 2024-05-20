@@ -107,26 +107,15 @@ class PostListView(ListCreateAPIView):
     queryset=Post.objects.all()
     serializer_class=PostSerializer
 
-    def allowed_methods(self):
-        return ['GET', 'POST']
-
 
 #게시물 detail
 class PostDetailView(RetrieveUpdateDestroyAPIView):
     queryset=Post.objects.all()
     serializer_class=PostSerializer
-    # lookup_field='id'
-    # lookup_url_kwarg='post_id'
+    lookup_field='id'
+    lookup_url_kwarg='post_id' #retrieve니까 필요 
     #kwarg에 url파라디터 담겨 있음 
     #self.kwargs != **kwargs
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
     
 # class PostViewSet(viewsets.ModelViewSet):
 #     queryset=Post.objects.all()
