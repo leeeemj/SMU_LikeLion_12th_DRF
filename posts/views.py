@@ -107,6 +107,8 @@ class PostListView(ListCreateAPIView):
     queryset=Post.objects.all()
     serializer_class=PostSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 #게시물 detail
 class PostDetailView(RetrieveUpdateDestroyAPIView):

@@ -5,7 +5,7 @@ urlpatterns = [
     
 ]
 router=DefaultRouter()
-router.register(r'user',views.UserViewSet)
+router.register(r'users',views.UserViewSet)
 # urlpatterns = [
 #     #path('', views.user_list_api_view,name='user-list'),#users로 시작하는 모든 패턴은 users.urls가서 찾아라
 #     # path('',views.user_join, name='user-join'),
