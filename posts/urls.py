@@ -11,7 +11,7 @@ urlpatterns = [
     
     #generics 
     path('',views.PostListView.as_view(),name='post_list'),
-    path('<int:pk>/',views.PostDetailView.as_view),
+    path('<int:post_id>/',views.PostDetailView.as_view(),name='post_detail'),
     # path('<int:pk>/',views.PostDetailView.as_view(),name='post_detail'),
     
 
