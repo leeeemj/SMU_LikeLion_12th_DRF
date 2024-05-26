@@ -5,10 +5,12 @@ from recomments.models import Recomment
 from recomments.models import RecommentLike
 from recomments.serializers import ReCommentSerializer
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 # Create your views here.
 #답글 작성 
 @api_view(['POST'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def recomment_create(request,comment_id): 
     try:
         comment=Comment.objects.get(id=comment_id) #댓글 달고자하는 게시물 존재 확인
@@ -27,6 +29,7 @@ def recomment_create(request,comment_id):
 
 #답글 수정, 삭제, 보기
 @api_view(['GET','PUT','DELETE'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def recomment_detail(request,pk):
     try:
         recomment=Recomment.objects.get(id=pk)
@@ -48,6 +51,7 @@ def recomment_detail(request,pk):
 
 #좋아요 생성 및 삭제 
 @api_view(['POST','DELETE'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def recomment_like(request,recomment_id):
     try:
         recomment=Recomment.objects.get(id=recomment_id)

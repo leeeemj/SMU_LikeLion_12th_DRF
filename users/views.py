@@ -10,6 +10,10 @@ from django.contrib.auth.hashers import check_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny
+from .permissions import IsUserOwner
+from django.shortcuts import get_object_or_404
+ 
 # Create your views here.
 
 #회원가입
@@ -87,13 +91,18 @@ def user_login(request):
 #     return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 #viewset
-#회원가입
 
 class UserViewSet(viewsets.ModelViewSet):
+    permission_classes=[IsUserOwner]
+    
     queryset=User.objects.all()
     serializer_class=UserSerializer
     lookup_field='id'
     lookup_url_kwarg='user_id'
+    
+    #get_object를 해야 has_object_permission 가능
+    def get_object(self):
+        return super().get_object()
 
     @action(methods=['POST'],detail=False,url_path='login',url_name='user_login')
     def user_login(self,request):
@@ -114,5 +123,6 @@ class UserViewSet(viewsets.ModelViewSet):
                 'user':serializer.data,
             }
         )
+    
 
     

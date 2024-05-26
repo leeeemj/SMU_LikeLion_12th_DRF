@@ -4,21 +4,17 @@ from posts.models import Post
 from posts.models import PostLike
 from posts.serializers import PostSerializer
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from comments.models import Comment
 from comments.serializers import CommentSerializer
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import (
-    ListAPIView,
-    CreateAPIView,
-    RetrieveAPIView,
-    UpdateAPIView,
-    DestroyAPIView,
     ListCreateAPIView,
-    RetrieveUpdateAPIView,
-    RetrieveDestroyAPIView,
     RetrieveUpdateDestroyAPIView,
 )
-from rest_framework import viewsets
+from .permissions import IsPostOwner
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
 # Create your views here.
 
 #게시물리스트 + 게시물 생성
@@ -83,6 +79,7 @@ def post_comments(request,post_id):
         
 #좋아요 생성 및 삭제 
 @api_view(['POST','DELETE'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def post_like(request,post_id):
     try:
         post=Post.objects.get(id=post_id)
@@ -104,6 +101,7 @@ def post_like(request,post_id):
 
 #게시물리스트 조회 및 생성
 class PostListView(ListCreateAPIView):
+    permission_classes=[IsPostOwner]
     queryset=Post.objects.all()
     serializer_class=PostSerializer
 
@@ -112,12 +110,15 @@ class PostListView(ListCreateAPIView):
 
 #게시물 detail
 class PostDetailView(RetrieveUpdateDestroyAPIView):
+    permission_classes=[IsPostOwner]
     queryset=Post.objects.all()
     serializer_class=PostSerializer
     lookup_field='id'
     lookup_url_kwarg='post_id' #retrieve니까 필요 
-    #kwarg에 url파라디터 담겨 있음 
-    #self.kwargs != **kwargs
+
+    #get_object를 해야 has_object_permission 가능
+    def get_object(self):
+        return super().get_object()
     
 # class PostViewSet(viewsets.ModelViewSet):
 #     queryset=Post.objects.all()

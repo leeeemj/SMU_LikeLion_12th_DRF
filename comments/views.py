@@ -6,10 +6,12 @@ from recomments.models import Recomment
 from posts.models import Post
 from comments.serializers import CommentSerializer
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 # Create your views here.
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def comment_create(request,post_id): 
     #인증 되었는지 확인 
     # if not request.user.is_authenticated:
@@ -28,6 +30,7 @@ def comment_create(request,post_id):
 
 #댓글 수정, 삭제, 보기
 @api_view(['GET','PUT','DELETE'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def comment_detail(request,comment_id):
     try:
         comment=Comment.objects.get(id=comment_id)
@@ -60,6 +63,7 @@ def recomment_list(request,pk):
     
 #좋아요 생성 및 삭제 
 @api_view(['POST','DELETE'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def comment_like(request,comment_id):
     try:
         comment=Comment.objects.get(id=comment_id)
